@@ -23,7 +23,7 @@ tailf -n1 '/tmp/irc.freenode.net/#buttsavage/out' | \
     while read -r date time nick mesg; do
         case $mesg in
             '!ping')
-                msg=${name}": Pong!"
+                msg=${nick}": Pong!"
                 ;;
             '!suicide')
                 msg='goodbye';
