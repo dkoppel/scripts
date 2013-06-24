@@ -22,27 +22,29 @@ tailf -n1 '/tmp/irc.freenode.net/#buttsavage/out' | \
     while read -r date time nick mesg; do
         case $mesg in
             '!ping')
-                msg=${nick}": Pong!"
+                msg=$(echo ${nick}|sed -e 's/>//g' -e 's/<//g')": Pong!"
                 ;;
-            '!pacman')
-                exec ~/scripts/pacman-short.sh > /tmp/irc.freenode.net/#buttsavage/in
-                ;;
+            #'!pacman')# this script floods and drops ii.
+            #    exec ~/scripts/pacman-short.sh > /tmp/irc.freenode.net/#buttsavage/in
+            #    ;;
             '!commit')
                 msg=$(curl -s whatthecommit.com/index.txt)
                 ;;
             '!fortune')
                 msg=$(fortune)
                 ;;
-            '!dns')
-                msg=$(host `echo $mesg | sed 's/\!dns //g'`)
+            '!echo'*)
+                msg="$date $time $nick $mesg" 
+                ;;
+            '!dns'*)
+                msg=$(host `echo $mesg | awk '{print $NF}'`)
                 ;;
             '!suicide')
-                [[ "$nick"=="kuroishi" ]] && msg='goodbye';
-                break
+                [ $nick ==  "<kuroishi>" ] && { echo 'goodbye' > /tmp/irc.freenode.net/#buttsavage/in ; break; }
                 ;;
         esac
     [[ -n $msg ]] && echo $msg ; msg=''
 done > /tmp/irc.freenode.net/#buttsavage/in
 killall ii
-#rm -rf /tmp/irc.freenode.net 
+rm -rf /tmp/irc.freenode.net 
 
