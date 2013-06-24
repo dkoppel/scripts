@@ -18,22 +18,31 @@ sleep 1
 echo '/j #buttsavage' > '/tmp/irc.freenode.net/in'
 sleep 1
 echo '-online-' > '/tmp/irc.freenode.net/#buttsavage/in'
-sleep 1
 tailf -n1 '/tmp/irc.freenode.net/#buttsavage/out' | \
     while read -r date time nick mesg; do
         case $mesg in
             '!ping')
                 msg=${nick}": Pong!"
                 ;;
+            '!pacman')
+                exec ~/scripts/pacman-short.sh > /tmp/irc.freenode.net/#buttsavage/in
+                ;;
+            '!commit')
+                msg=$(curl -s whatthecommit.com/index.txt)
+                ;;
+            '!fortune')
+                msg=$(fortune)
+                ;;
+            '!dns')
+                msg=$(host `echo $mesg | sed 's/\!dns //g'`)
+                ;;
             '!suicide')
-                msg='goodbye';
+                [[ "$nick"=="kuroishi" ]] && msg='goodbye';
                 break
                 ;;
         esac
-    echo $msg
-    msg=''
-    echo -ne > /tmp/irc.freenode.net/#buttsavage/out
+    [[ -n $msg ]] && echo $msg ; msg=''
 done > /tmp/irc.freenode.net/#buttsavage/in
 killall ii
-rm -rf /tmp/irc.freenode.net 
+#rm -rf /tmp/irc.freenode.net 
 
