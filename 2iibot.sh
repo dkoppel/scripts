@@ -17,11 +17,14 @@ SERVER="irc.freenode.net"
 CHANNEL="#buttsavage"
 NICK="dav3bot"
 
-(
+
+
+( 
 flock -n -e 200 || exit 1
-ii -s ${SERVER} -n ${NICK} -i /tmp/&
+echo 'got lock'
+ii -s ${SERVER} -n ${NICK} -i /tmp/& 
 echo $! > /tmp/iibot.pid
-trap 'kill `cat /tmp/iibot.pid`;rm /tmp/iibot.pid' EXIT
+trap 'kill `cat /tmp/iibot.pid`;rm /tmp/iibot.pid' EXIT 
 sleep 1
 echo "/j ${CHANNEL}" > /tmp/${SERVER}/in
 sleep 1
@@ -32,6 +35,9 @@ tailf -n1 /tmp/${SERVER}/${CHANNEL}/out | \
             '!ping')
                 msg=$(echo ${nick}|sed -e 's/>//g' -e 's/<//g')": Pong!"
                 ;;
+            #'!pacman')# this script floods and drops ii.
+            #    exec ~/scripts/pacman-short.sh > /tmp/${SERVER}/${CHANNEL}/in
+            #    ;;
             '!commit')
                 msg=$(curl -s whatthecommit.com/index.txt)
                 ;;
@@ -39,16 +45,19 @@ tailf -n1 /tmp/${SERVER}/${CHANNEL}/out | \
                 msg=$(fortune)
                 ;;
             '!echo'*)
-                msg="$date $time $nick $mesg"
+                msg="$date $time $nick $mesg" 
                 ;;
             '!dns'*)
                 msg=$(host `echo $mesg | awk '{print $NF}'`)
                 ;;
             '!suicide')
-                [ $nick == "<kuroishi>" ] && { echo 'goodbye' > /tmp/${SERVER}/${CHANNEL}/in ; break; }
+                [ $nick ==  "<kuroishi>" ] && { echo 'goodbye' > /tmp/${SERVER}/${CHANNEL}/in ; break; }
                 ;;
         esac
     [[ -n $msg ]] && echo $msg ; msg=''
 done > /tmp/${SERVER}/${CHANNEL}/in
-rm -rf /tmp/${SERVER}
+kill `cat /tmp/iibot.pid` ; rm /tmp/iibot.pid
 ) 200>/var/lock/.ii.lock
+echo 'lock free'
+# rm -rf /tmp/${SERVER} 
+

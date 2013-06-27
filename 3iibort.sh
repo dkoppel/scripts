@@ -1,18 +1,4 @@
 #!/bin/bash
-#           _ ._  _ , _ ._
-#         (_ ' ( `  )_  .__)
-#       ( (  (    )   `)  ) _)
-#      (__ (_   (_ . _) _) ,__)
-#          `~~`\ ' . /`~~`
-#          ,::: ;   ; :::,
-#         ':::::::::::::::'
-# _____________/_ __ \____________
-#|                                |
-#| iibot - an irc bot based on II |
-#| http://tools.suckless.org/ii/  |
-#|                                |
-#|________________________________|
-
 SERVER="irc.freenode.net"
 CHANNEL="#buttsavage"
 NICK="dav3bot"
@@ -28,7 +14,7 @@ sleep 1
 echo "-online-" > /tmp/${SERVER}/${CHANNEL}/in
 tailf -n1 /tmp/${SERVER}/${CHANNEL}/out | \
     while read -r date time nick mesg; do
-        case $mesg in
+case $mesg in
             '!ping')
                 msg=$(echo ${nick}|sed -e 's/>//g' -e 's/<//g')": Pong!"
                 ;;
@@ -50,5 +36,6 @@ tailf -n1 /tmp/${SERVER}/${CHANNEL}/out | \
         esac
     [[ -n $msg ]] && echo $msg ; msg=''
 done > /tmp/${SERVER}/${CHANNEL}/in
+kill `cat /tmp/iibot.pid` ; rm /tmp/iibot.pid
 rm -rf /tmp/${SERVER}
 ) 200>/var/lock/.ii.lock
